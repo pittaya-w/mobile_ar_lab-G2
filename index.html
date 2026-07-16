@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Simple Mobile AR Lab - Motor Status</title>
 
-  <!-- Open-source libraries. The versions are pinned so A-Frame and AR.js match. -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>
 
@@ -45,21 +44,23 @@
       justify-content: center;
       gap: 10px;
       padding: 0 12px;
+      flex-wrap: wrap; /* รองรับกรณีปุ่มเยอะขึ้นบนจอมือถือขนาดเล็ก */
     }
 
     button {
-      min-width: 132px;
+      min-width: 110px;
       min-height: 48px;
       border: 0;
       border-radius: 12px;
       padding: 10px 14px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       touch-action: manipulation;
     }
 
     #run-button { background: #ffffff; color: #111111; }
+    #speed-button { background: #00e676; color: #111111; } /* ปุ่มเร่งความเร็วสีเขียวสว่าง */
     #status-button { background: #ffd54f; color: #111111; }
 
     .hint {
@@ -99,10 +100,12 @@
       const arLabel = document.querySelector('#ar-label');
       const topPanel = document.querySelector('#top-panel');
       const runButton = document.querySelector('#run-button');
+      const speedButton = document.querySelector('#speed-button'); // ดึง Element ปุ่มความเร็ว
       const statusButton = document.querySelector('#status-button');
 
       let running = true;
       let warning = false;
+      let fastSpeed = false; // ตัวแปรเก็บสถานะความเร็ว (false = ปกติ, true = เร็ว)
 
       marker.addEventListener('markerFound', () => {
         topPanel.innerHTML = 'พบ Hiro Marker แล้ว — โมเดลมอเตอร์พร้อมใช้งาน<span class="hint">แตะปุ่มด้านล่างเพื่อทดลองควบคุม</span>';
@@ -116,6 +119,21 @@
         running = !running;
         shaft.setAttribute('spin-control', 'active', running);
         runButton.textContent = running ? 'หยุดมอเตอร์' : 'เริ่มมอเตอร์';
+      });
+
+      // ดักจับ Event ตอนกดปุ่มเร่งความเร็ว
+      speedButton.addEventListener('click', () => {
+        fastSpeed = !fastSpeed;
+        
+        // ตั้งค่าความเร็วใหม่ (ความเร็วปกติเริ่มต้นคือ 220, ถ้าเร่งจะปรับเป็น 600)
+        const targetSpeed = fastSpeed ? 600 : 220;
+        shaft.setAttribute('spin-control', 'speed', targetSpeed);
+        
+        // เปลี่ยนข้อความบนปุ่ม
+        speedButton.textContent = fastSpeed ? 'ลดความเร็ว' : 'เร่งความเร็ว';
+        
+        // ปรับแต่ง UI เพิ่มเติม: เปลี่ยนสีปุ่มให้เห็นความต่างชัดเจน
+        speedButton.style.background = fastSpeed ? '#ff5252' : '#00e676';
       });
 
       statusButton.addEventListener('click', () => {
@@ -147,7 +165,7 @@
 
   <div id="controls">
     <button id="run-button" type="button">หยุดมอเตอร์</button>
-    <button id="status-button" type="button">จำลองคำเตือน</button>
+    <button id="speed-button" type="button">เร่งความเร็ว</button> <button id="status-button" type="button">จำลองคำเตือน</button>
   </div>
 
   <a-scene
@@ -165,7 +183,6 @@
       smooth-tolerance="0.01"
       smooth-threshold="3"
     >
-      <!-- Floor plate -->
       <a-box
         position="0 0.04 0"
         width="1.35"
@@ -175,11 +192,9 @@
         roughness="0.8"
       ></a-box>
 
-      <!-- Two mounting feet -->
       <a-box position="-0.42 0.15 0" width="0.18" height="0.18" depth="0.55" color="#263238"></a-box>
       <a-box position="0.42 0.15 0" width="0.18" height="0.18" depth="0.55" color="#263238"></a-box>
 
-      <!-- Motor housing: cylinder lies along X axis -->
       <a-cylinder
         id="motor-body"
         position="0 0.47 0"
@@ -192,7 +207,6 @@
         roughness="0.55"
       ></a-cylinder>
 
-      <!-- Rear cap -->
       <a-cylinder
         position="-0.40 0.47 0"
         rotation="0 0 90"
@@ -201,7 +215,6 @@
         color="#90a4ae"
       ></a-cylinder>
 
-      <!-- Shaft assembly: parent fixes the shaft direction; child spins locally -->
       <a-entity position="0.52 0.47 0" rotation="0 0 90">
         <a-cylinder
           id="shaft"
@@ -216,7 +229,6 @@
         </a-cylinder>
       </a-entity>
 
-      <!-- Status lamp -->
       <a-sphere
         id="warning-lamp"
         position="0 0.87 0"
@@ -225,7 +237,6 @@
         material="emissive: #00c853; emissiveIntensity: 0.8"
       ></a-sphere>
 
-      <!-- AR information label -->
       <a-text
         id="ar-label"
         value="MOTOR M1\nSTATUS: NORMAL"
