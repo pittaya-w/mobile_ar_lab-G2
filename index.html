@@ -60,7 +60,7 @@
     }
 
     #run-button { background: #ffffff; color: #111111; }
-    #speed-button { background: #00e676; color: #111111; } /* ปุ่มเร่งความเร็วสีเขียวสว่าง */
+    #speed-button { background: #77e676; color: #111111; } /* ปุ่มเร่งความเร็วสีเขียวสว่าง */
     #status-button { background: #ffd54f; color: #111111; }
 
     .hint {
@@ -140,13 +140,13 @@
         warning = !warning;
 
         if (warning) {
-          motorBody.setAttribute('color', '#CC00CC');
+          motorBody.setAttribute('color', '#8800CC');
           warningLamp.setAttribute('color', '#0000CD');
           warningLamp.setAttribute('material', 'emissive', '#0000CD');
           arLabel.setAttribute('value', 'MOTOR M1\nSTATUS: WARNING');
           statusButton.textContent = 'เปลี่ยนเป็นปกติ';
         } else {
-          motorBody.setAttribute('color', '#99CC66');
+          motorBody.setAttribute('color', '#22CC66');
           warningLamp.setAttribute('color', '#00e676');
           warningLamp.setAttribute('material', 'emissive', '#00c853');
           arLabel.setAttribute('value', 'MOTOR M1\nSTATUS: NORMAL');
